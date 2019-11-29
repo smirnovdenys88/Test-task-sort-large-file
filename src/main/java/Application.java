@@ -125,20 +125,22 @@ public class Application {
         boolean flag = true;
         FileWriter fr = new FileWriter(out, true);
         int max = 0;
+        int number;
 
         while (flag) {
             String line = "";
             for (j = 0; j <= i; j++) {
                 try {
-
                     while ((line = brs.get(j).readLine()) != null) {
-                        line += Integer.valueOf(line);
+                        number = Integer.valueOf(line);
+                        max = max < number ? number : max;
+
+                        integers.add(number);
                         break;
                     }
                     if (j == 0) {
                         flag = line != null;
                     }
-
                 } catch (IOException e) {
                     System.err.format("IOException: %s%n", e);
                 }
