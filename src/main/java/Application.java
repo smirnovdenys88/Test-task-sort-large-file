@@ -54,8 +54,10 @@ public class Application {
         System.out.println("Start process cutFile");
         FileChannel source = new FileInputStream(new File(path + "/data.txt")).getChannel();
         ByteBuffer buf = ByteBuffer.allocateDirect(DEFAULT_BUFFER_SIZE);
-        FileChannel destination = new FileOutputStream(new File(path + "/temp-" + i + ".txt")).getChannel();
+        File file = new File(path + "/temp-" + i + ".txt");
+        files.add(file);
 
+        FileChannel destination = new FileOutputStream(file).getChannel();
         while ((source.read(buf)) != -1) {
             buf.flip();
             destination.write(buf);
@@ -63,7 +65,7 @@ public class Application {
                 i++;
                 destination.close();
 
-                File file = new File(path + "/temp-" + i + ".txt");
+                file = new File(path + "/temp-" + i + ".txt");
                 files.add(file);
 
                 destination = new FileOutputStream(file).getChannel();
@@ -131,11 +133,15 @@ public class Application {
             String line = "";
             for (j = 0; j <= i; j++) {
                 try {
-                    while ((line = brs.get(j).readLine()) != null) {
-                        number = Integer.valueOf(line);
-                        max = max < number ? number : max;
 
-                        integers.add(number);
+                    while ((line = brs.get(j).readLine()) != null) {
+//                        number = Integer.valueOf(line);
+//                        max = max < number ? number : max;
+//                        integers.add(number);
+//                        line += number;
+                        fr.write(line);
+                        fr.write("\n");
+                        fr.flush();
                         break;
                     }
                     if (j == 0) {
@@ -145,10 +151,6 @@ public class Application {
                     System.err.format("IOException: %s%n", e);
                 }
             }
-
-            fr.write(line);
-            fr.write("\n");
-            fr.flush();
             integers.clear();
         }
 
