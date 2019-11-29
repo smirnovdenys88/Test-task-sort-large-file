@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class Application {
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 1; // 1 MB
@@ -126,31 +124,37 @@ public class Application {
 
         boolean flag = true;
         FileWriter fr = new FileWriter(out, true);
+        int max = 0;
+
         while (flag) {
+            String line = "";
             for (j = 0; j <= i; j++) {
                 try {
-                    String line;
+
                     while ((line = brs.get(j).readLine()) != null) {
-                        fr.write(line);
-                        fr.write("\n");
-                        fr.flush();
+                        line += Integer.valueOf(line);
                         break;
                     }
-                    if(j == 0){
+                    if (j == 0) {
                         flag = line != null;
                     }
+
                 } catch (IOException e) {
                     System.err.format("IOException: %s%n", e);
                 }
             }
+
+            fr.write(line);
+            fr.write("\n");
+            fr.flush();
             integers.clear();
         }
 
-        for (BufferedReader reader: brs) {
+        for (BufferedReader reader : brs) {
             reader.close();
         }
 
-        for(File file: files){
+        for (File file : files) {
             Files.deleteIfExists(file.toPath());
         }
 

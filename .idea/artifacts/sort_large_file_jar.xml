@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="sort-large-file:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/sort_large_file_jar</output-path>
+    <root id="archive" name="sort-large-file.jar">
+      <element id="module-output" name="sort-large-file" />
+    </root>
+  </artifact>
+</component>
