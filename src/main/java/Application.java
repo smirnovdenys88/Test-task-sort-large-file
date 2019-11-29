@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 public class Application {
+    private static Logger logger = Logger.getLogger(Application.class.getName());
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 1; // 1 MB
     private static final int FILE_SEGMENT_SIZE = 1024; // 1 MB
     private static final int FILE_SIZE = 1024 * 16; // 10 MB
@@ -33,7 +35,7 @@ public class Application {
     }
 
     static void createLargeFile() throws IOException {
-        System.out.println("Start process createLargeFile finish");
+        logger.info("Start process createLargeFile finish");
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(path + "/data.txt")));
         String str = "";
         while (str.length() < FILE_SIZE) {// 120 MB
@@ -47,11 +49,11 @@ public class Application {
             }
         }
         bufferedWriter.close();
-        System.out.println("Finish process createLargeFile");
+        logger.info("Finish process createLargeFile");
     }
 
     static void cutFile() throws IOException {
-        System.out.println("Start process cutFile");
+        logger.info("Start process cutFile");
         FileChannel source = new FileInputStream(new File(path + "/data.txt")).getChannel();
         ByteBuffer buf = ByteBuffer.allocateDirect(DEFAULT_BUFFER_SIZE);
         File file = new File(path + "/temp-" + i + ".txt");
@@ -76,11 +78,11 @@ public class Application {
             buf.clear();
         }
         source.close();
-        System.out.println("Finish process cutFile");
+        logger.info("Finish process cutFile");
     }
 
     static void sortFile() throws IOException {
-        System.out.println("Start process sort by files");
+        logger.info("Start process sort by files");
         List<Integer> integers = new ArrayList<>();
 
         //Sort ever file
@@ -111,11 +113,11 @@ public class Application {
             }
             integers.clear();
         }
-        System.out.println("Finish process sort by files");
+        logger.info("Finish process sort by files");
     }
 
     private static void mergeFile() throws IOException {
-        System.out.println("Start process mergeFile");
+        logger.info("Start process merge file");
         File out = new File(pathOutFile);
 
         List<Integer> integers = new ArrayList<>();
@@ -126,19 +128,12 @@ public class Application {
 
         boolean flag = true;
         FileWriter fr = new FileWriter(out, true);
-        int max = 0;
-        int number;
 
         while (flag) {
-            String line = "";
+            String line;
             for (j = 0; j <= i; j++) {
                 try {
-
                     while ((line = brs.get(j).readLine()) != null) {
-//                        number = Integer.valueOf(line);
-//                        max = max < number ? number : max;
-//                        integers.add(number);
-//                        line += number;
                         fr.write(line);
                         fr.write("\n");
                         fr.flush();
@@ -163,6 +158,6 @@ public class Application {
         }
 
         fr.close();
-        System.out.println("Finish process mergeFile");
+        logger.info("Finish process merge file");
     }
 }
