@@ -19,9 +19,8 @@ import java.util.stream.Collectors;
 public class Application {
     private static Logger logger = Logger.getLogger(Application.class.getName());
     private static final int DEFAULT_BUFFER_SIZE = 1024; // 1 MB
-//    private static final int FILE_SEGMENT_SIZE = 1024; // 1 MB
-    private static final int FILE_SEGMENT_SIZE = 1024; // 1 MB
-    private static final int FILE_SIZE = 1024 * 1024; // 10 MB
+    private static final int FILE_SEGMENT_SIZE = 100000; // 1 MB
+    private static final long FILE_SIZE = 147000; // 1 GB
     private static Random random = new Random();
     private static int j = 0;
     private static int i = 0;
@@ -39,33 +38,20 @@ public class Application {
     static void createLargeFile() throws IOException {
         logger.info("Start process createLargeFile finish");
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(path + "/data.txt")));
-        String str = "";
+        StringBuffer stringBuilder = new StringBuffer();
 
-        Set<Integer> set = new HashSet<>();
-        while (set.size() < FILE_SIZE){
-            if (str.length() == FILE_SIZE) {
-                set.add(random.nextInt(Integer.MAX_VALUE));
+        while (stringBuilder.length() < FILE_SIZE) {
+            if (stringBuilder.length() == FILE_SIZE) {
+                stringBuilder.append(random.nextInt(Integer.MAX_VALUE));
             } else {
-                set.add(random.nextInt(Integer.MAX_VALUE));
+                stringBuilder.append(random.nextInt(Integer.MAX_VALUE));
+                stringBuilder.append("\n");
             }
+            bufferedWriter.write(stringBuilder.toString());
+            bufferedWriter.flush();
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(set.stream().map(s -> s.toString()).collect(Collectors.joining("\n")));
-        bufferedWriter.write(stringBuilder.toString());
         bufferedWriter.close();
-
-//        while (str.length() < FILE_SIZE) {// 120 MB
-//
-//            bufferedWriter.write(str);
-//            bufferedWriter.flush();
-//            if (str.length() == FILE_SIZE) {
-//                str += random.nextInt(Integer.MAX_VALUE);
-//            } else {
-//                str += random.nextInt(Integer.MAX_VALUE) + "\n";
-//            }
-//        }
-//        bufferedWriter.close();
-//        logger.info("Finish process createLargeFile");
+        logger.info("Finish process createLargeFile");
     }
 
     static void cutFile() throws IOException {
@@ -101,11 +87,12 @@ public class Application {
     static void sortFile() throws IOException {
         logger.info("Start process sort by files");
         List<Integer> integers = new ArrayList<>();
-
+        BufferedReader br;
+        BufferedWriter writer;
+        String line;
         for (j = 0; j <= i; j++) {
-            BufferedReader br = new BufferedReader(new FileReader(files.get(j)));
+            br = new BufferedReader(new FileReader(files.get(j)));
             try {
-                String line;
                 while ((line = br.readLine()) != null) {
                     if (!line.isEmpty()) integers.add(Integer.valueOf(line));
                 }
@@ -116,7 +103,7 @@ public class Application {
             }
 
             Collections.sort(integers);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(files.get(j)));
+            writer = new BufferedWriter(new FileWriter(files.get(j)));
             try {
                 for (Integer itt : integers) {
                     writer.write(itt + "\n");
@@ -160,16 +147,17 @@ public class Application {
         while (flag) {
             for (j = 0; j <= i; j++)  {
                 try {
+
+                    if(stopRead == i){
+                        flag = false;
+                        break;
+                    }
                     if(indexValue.get(j) > -1) continue;
 
                     value = brs.get(j).readLine();
                     if(value == null){
                         stopRead++;
                         continue;
-                    }
-                    if(stopRead == i){
-                        flag = false;
-                        break;
                     }
                     indexValue.put(j, Integer.valueOf(value));
                 } catch (IOException e) {
@@ -184,16 +172,19 @@ public class Application {
 
             if(indexValueTree.isEmpty()) break;
             final Integer finalX = x;
-            if(!indexValueTree.values().stream().filter(s -> s.equals(finalX)).findFirst().isPresent()) x++;
+            if(!indexValueTree.values().stream().filter(s -> s.equals(finalX)).findFirst().isPresent()) x = indexValueTree.values().stream().findFirst().get();
 
+            StringBuilder stringBuilder = new StringBuilder();
             for (Map.Entry<Integer,Integer> intTree: indexValueTree.entrySet()){
                 if(x != intTree.getValue()) continue;
                 x = intTree.getValue();
-                fr.write(intTree.getValue());
-                fr.write("\n");
-                fr.flush();
+                stringBuilder.append(x);
+                stringBuilder.append("\n");
                 indexValue.put(intTree.getKey(), -1);
             }
+
+            fr.write(stringBuilder.toString());
+            fr.flush();
 
             integers.clear();
         }
