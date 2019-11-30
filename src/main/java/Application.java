@@ -31,9 +31,9 @@ public class Application {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         createLargeFile();
-        cutFile();
-        sortFile();
-        mergeFile();
+        cutLargeFile();
+        sortSmallFiles();
+        mergeSortedSmallFilesInLargeSortFile();
     }
 
     static void createLargeFile() throws IOException {
@@ -52,7 +52,7 @@ public class Application {
         logger.info("Finish process createLargeFile");
     }
 
-    static void cutFile() throws IOException {
+    static void cutLargeFile() throws IOException {
         logger.info("Start process cutFile");
 
         FileChannel source = new FileInputStream(file).getChannel();
@@ -87,7 +87,7 @@ public class Application {
         logger.info("Finish process cutFile");
     }
 
-    static void sortFile() throws IOException {
+    static void sortSmallFiles() throws IOException {
         logger.info("Start process sort by files");
 
 
@@ -132,7 +132,7 @@ public class Application {
         logger.info("Finish process sort by files");
     }
 
-    private static void mergeFile() throws IOException {
+    private static void mergeSortedSmallFilesInLargeSortFile() throws IOException {
         logger.info("Start process merge file");
 
         Map<Integer,Integer> indexValueTree;
