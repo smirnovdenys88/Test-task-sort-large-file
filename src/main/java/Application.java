@@ -76,10 +76,10 @@ public class Application {
                 filesSort.add(new File(location.getPath() +"/sort-" + i + ".txt"));
                 destination = new FileOutputStream(file).getChannel();
                 j = 0;
+                logger.info("create short file: " + file.getName());
             } else {
                 j++;
             }
-            logger.info("create file: " + file.getName());
             buf.clear();
         }
         source.close();
