@@ -1,13 +1,6 @@
 import javafx.beans.binding.StringBinding;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
@@ -19,7 +12,7 @@ import java.util.stream.Collectors;
 public class Application {
     private static Logger logger = Logger.getLogger(Application.class.getName());
     private static final int DEFAULT_BUFFER_SIZE = 1024; // 1 MB
-    private static final int FILE_SEGMENT_SIZE = 100000; // 1 MB
+    private static final int FILE_SEGMENT_SIZE = 66000; // 102,4 MB
     private static final long FILE_SIZE = 147000; // 1 GB
     private static Random random = new Random();
     private static int j = 0;
@@ -39,14 +32,9 @@ public class Application {
         logger.info("Start process createLargeFile finish");
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(path + "/data.txt")));
         StringBuffer stringBuilder = new StringBuffer();
-
-        while (stringBuilder.length() < FILE_SIZE) {
-            if (stringBuilder.length() == FILE_SIZE) {
-                stringBuilder.append(random.nextInt(Integer.MAX_VALUE));
-            } else {
-                stringBuilder.append(random.nextInt(Integer.MAX_VALUE));
-                stringBuilder.append("\n");
-            }
+        while (stringBuilder.length() <= FILE_SIZE) {
+            stringBuilder.append(random.nextInt(Integer.MAX_VALUE));
+            stringBuilder.append("\n");
             bufferedWriter.write(stringBuilder.toString());
             bufferedWriter.flush();
         }
@@ -57,7 +45,7 @@ public class Application {
     static void cutFile() throws IOException {
         logger.info("Start process cutFile");
 
-        FileChannel source = new FileInputStream(new File(path + "/data.txt")).getChannel();
+        FileChannel source = new FileInputStream(path + "/data.txt").getChannel();
         ByteBuffer buf = ByteBuffer.allocateDirect(DEFAULT_BUFFER_SIZE);
         File file = new File(path + "/temp-" + i + ".txt");
         files.add(file);
@@ -87,11 +75,15 @@ public class Application {
     static void sortFile() throws IOException {
         logger.info("Start process sort by files");
         List<Integer> integers = new ArrayList<>();
+        FileReader reader;
         BufferedReader br;
+
+        FileWriter fileWriter;
         BufferedWriter writer;
         String line;
         for (j = 0; j <= i; j++) {
-            br = new BufferedReader(new FileReader(files.get(j)));
+            reader = new FileReader(files.get(j));
+            br = new BufferedReader(reader);
             try {
                 while ((line = br.readLine()) != null) {
                     if (!line.isEmpty()) integers.add(Integer.valueOf(line));
@@ -99,11 +91,13 @@ public class Application {
             } catch (IOException e) {
                 System.err.format("IOException: %s%n", e);
             } finally {
+                reader.close();
                 br.close();
             }
 
             Collections.sort(integers);
-            writer = new BufferedWriter(new FileWriter(files.get(j)));
+            fileWriter = new FileWriter(files.get(j));
+            writer = new BufferedWriter(fileWriter);
             try {
                 for (Integer itt : integers) {
                     writer.write(itt + "\n");
@@ -112,6 +106,7 @@ public class Application {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
+                fileWriter.close();
                 writer.close();
             }
             integers.clear();
@@ -123,22 +118,19 @@ public class Application {
         logger.info("Start process merge file");
         File out = new File(pathOutFile);
 
+        Map<Integer,Integer> indexValueTree;
         List<Integer> integers = new ArrayList<>();
         List<BufferedReader> brs = new ArrayList<>();
+        Map<Integer,Integer> indexValue = new HashMap<>();
+
         for (j = 0; j <= i; j++) {
             brs.add(new BufferedReader(new FileReader(files.get(j))));
+            indexValue.put(j, -1);
         }
 
         boolean flag = true;
         FileWriter fr = new FileWriter(out, true);
 
-        Map<Integer,Integer> indexValue = new HashMap<>();
-
-        for(j = 0; j <= i; j++){
-            indexValue.put(j, -1);
-        }
-
-        Map<Integer,Integer> indexValueTree;
         String value;
         int stopRead = 0;
         int x = 0;
