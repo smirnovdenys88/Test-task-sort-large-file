@@ -1,12 +1,24 @@
-import javafx.beans.binding.StringBinding;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -89,7 +101,6 @@ public class Application {
 
     static void sortSmallFiles() throws IOException {
         logger.info("Start process sort by files");
-
 
         for (j = 0; j <= i; j++) {
             String line;
